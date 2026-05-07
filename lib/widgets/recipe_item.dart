@@ -38,6 +38,11 @@ class RecipeItem extends StatelessWidget {
               );
             }, 
             icon: const Icon(Icons.share)),
+            IconButton(onPressed: (){
+              recipeProvider.deleteRecipe(recipe.id);
+            }, 
+            icon: const Icon(Icons.delete, color: Colors.red,)),
+
           ],
         ),
       ),

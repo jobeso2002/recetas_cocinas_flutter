@@ -12,6 +12,13 @@ class RecipeProvider with ChangeNotifier{
 
   List<Recipe> get favoriteRecipes => _recipes.where((recipe) => recipe.isFavorite).toList();
 
+
+  void deleteRecipe(String id){
+    _recipes.removeWhere((recipe) => recipe.id == id);
+    notifyListeners();
+  }
+
+
   void toggleFavorite(String id){
     final index = _recipes.indexWhere((recipe)=> recipe.id == id);
     if(index != -1){
