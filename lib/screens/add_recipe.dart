@@ -5,7 +5,8 @@ import 'package:recetas_cocinas/providers/recipe_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class AddRecipeScreen extends StatefulWidget {
-  const AddRecipeScreen({super.key});
+  final Recipe? recipe;
+  const AddRecipeScreen({super.key, this.recipe});
 
   @override
   State<AddRecipeScreen> createState() => _AddRecipeScreenState();
@@ -17,27 +18,44 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   final _descriptionController = TextEditingController();
   final _ingredientsController = TextEditingController();
   final _imageUrlController = TextEditingController();
+  bool _isEditing = false;
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      final newRecipe = Recipe(
-        id: Uuid().v4(),
-        title: _titleController.text,
-        description: _descriptionController.text,
-        ingredients: _ingredientsController.text
-            .split(',')
-            .map((e) => e.trim())
-            .toList(),
-        imageUrl: _imageUrlController.text,
-      );
+  @override
+  void initState() {
+    super.initState();
 
-      Provider.of<RecipeProvider>(context, listen: false).addRecipe(newRecipe);
-      Navigator.of(context).pop();
+    if (widget.recipe != null) {
+      _isEditing = true;
+
+      _titleController.text = widget.recipe!.title;
+      _descriptionController.text = widget.recipe!.description;
+      _ingredientsController.text = widget.recipe!.ingredients.join(', ');
+      _imageUrlController.text = widget.recipe!.imageUrl;
     }
   }
 
+//no lo voy a eliminar ya que ando usando initstate esta era la version anterior que funcionaba para crear
+  // void _submitForm() {
+  //   if (_formKey.currentState!.validate()) {
+  //     final newRecipe = Recipe(
+  //       id: Uuid().v4(),
+  //       title: _titleController.text,
+  //       description: _descriptionController.text,
+  //       ingredients: _ingredientsController.text
+  //           .split(',')
+  //           .map((e) => e.trim())
+  //           .toList(),
+  //       imageUrl: _imageUrlController.text,
+  //     );
+
+  //     Provider.of<RecipeProvider>(context, listen: false).addRecipe(newRecipe);
+  //     Navigator.of(context).pop();
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
+    final recipeProvider = Provider.of<RecipeProvider>(context, listen: false);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -98,9 +116,44 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               ),
               const SizedBox(height: 10),
               ElevatedButton(
-                onPressed: _submitForm,
-                child: const Text('Agregar Receta'),
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+                    if (_isEditing) {
+                      recipeProvider.updateRecipe(
+                        widget.recipe!.id,
+                        _titleController.text,
+                        _descriptionController.text,
+                        _ingredientsController.text
+                            .split(',')
+                            .map((e) => e.trim())
+                            .toList(),
+                        _imageUrlController.text,
+                      );
+                    } else {
+                      recipeProvider.addRecipe(
+                        Recipe(
+                          id: Uuid().v4(),
+                          title: _titleController.text,
+                          description: _descriptionController.text,
+                          ingredients: _ingredientsController.text
+                              .split(',')
+                              .map((e) => e.trim())
+                              .toList(),
+                          imageUrl: _imageUrlController.text,
+                        ),
+                      );
+                    }
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text(_isEditing ? 'Guardar Cambios' : 'Agregar Receta'),
               ),
+              // const SizedBox(height: 10),
+              // ElevatedButton(
+              //   onPressed: _submitForm,
+              //   child: const Text('Agregar Receta'),
+              // ),
             ],
           ),
         ),

@@ -18,6 +18,21 @@ class RecipeProvider with ChangeNotifier{
     notifyListeners();
   }
 
+  void updateRecipe(String id, String newtitle, String newdescription, List<String> newingredients, String newimageUrl){
+    final updateindex = _recipes.indexWhere((recipe) => recipe.id == id);
+    if(updateindex != -1){
+      _recipes[updateindex] = Recipe(
+        id: id,
+        title: newtitle,
+        description: newdescription,
+        ingredients: newingredients,
+        imageUrl: newimageUrl,
+        isFavorite: _recipes[updateindex].isFavorite,
+      );
+      notifyListeners();
+    }
+  }
+
 
   void toggleFavorite(String id){
     final index = _recipes.indexWhere((recipe)=> recipe.id == id);
