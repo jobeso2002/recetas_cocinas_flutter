@@ -10,6 +10,8 @@ class RecipeProvider with ChangeNotifier{
     notifyListeners();
   }
 
+  List<Recipe> get favoriteRecipes => _recipes.where((recipe) => recipe.isFavorite).toList();
+
   void toggleFavorite(String id){
     final index = _recipes.indexWhere((recipe)=> recipe.id == id);
     if(index != -1){

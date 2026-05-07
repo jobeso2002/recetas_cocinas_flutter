@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:recetas_cocinas/models/recipes.dart';
+import 'package:recetas_cocinas/providers/recipe_provider.dart';
 
 class RecipeItem extends StatelessWidget {
   final Recipe recipe;
@@ -7,6 +9,10 @@ class RecipeItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final recipeProvider = Provider.of<RecipeProvider>(context);
+
+
+
     return Card(
       margin: const EdgeInsets.all(8.0),
       child: ListTile(
@@ -19,6 +25,7 @@ class RecipeItem extends StatelessWidget {
           icon: Icon(recipe.isFavorite ? Icons.favorite_border_outlined : Icons.favorite_border_outlined, color: recipe.isFavorite ? Colors.red : null),
           onPressed: () {
             // Aquí podrías llamar a un método del provider para cambiar el estado de favorito
+          recipeProvider.toggleFavorite(recipe.id);
           },
         ),
       ),

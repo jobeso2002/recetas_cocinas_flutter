@@ -12,21 +12,35 @@ class RecipesList extends StatefulWidget {
 }
 
 class _RecipesListState extends State<RecipesList> {
+  bool _showFavoritesOnly = false;
   String _searchQuery = '';
+
   @override
   Widget build(BuildContext context) {
     final recipeProvider = Provider.of<RecipeProvider>(context);
-    final recipes = recipeProvider.recipes.where((recipe){
-      final lowerQuery = _searchQuery.toLowerCase();
-      return recipe.title.toLowerCase().contains(lowerQuery) || recipe.ingredients.any((ingredient) => ingredient.toLowerCase().contains(lowerQuery));
-    }).toList();
-
+    final recipes = _showFavoritesOnly ? recipeProvider.favoriteRecipes : recipeProvider.recipes.where((recipe){
     
+    final lowerQuery = _searchQuery.toLowerCase();
+    return recipe.title.toLowerCase().contains(lowerQuery) || recipe.ingredients.any((ingredient) => ingredient.toLowerCase().contains(lowerQuery));
+
+    }).toList();
     
     
     
     return Scaffold(
-      appBar: AppBar(title: const Text('Recetas de cocina 🍱')),
+      appBar: AppBar(title: const Text('Recetas de cocina 🍱'),
+      
+      actions: [
+          IconButton(
+            icon: Icon(_showFavoritesOnly ? Icons.favorite : Icons.favorite_border),
+            onPressed: () {
+              setState(() {
+                _showFavoritesOnly = !_showFavoritesOnly;
+              });
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
