@@ -1,29 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:recetas_cocinas/providers/recipe_provider.dart';
+import 'package:recetas_cocinas/screens/add_recipe.dart';
 import 'package:recetas_cocinas/widgets/recipe_item.dart';
 
-class RecipesList extends StatelessWidget {
+class RecipesList extends StatefulWidget {
   const RecipesList({super.key});
 
   @override
+  State<RecipesList> createState() => _RecipesListState();
+}
+
+class _RecipesListState extends State<RecipesList> {
+  String _searchQuery = '';
+  @override
   Widget build(BuildContext context) {
     final recipeProvider = Provider.of<RecipeProvider>(context);
-    final recipes = recipeProvider.recipes;
+    final recipes = recipeProvider.recipes.where((recipe){
+      final lowerQuery = _searchQuery.toLowerCase();
+      return recipe.title.toLowerCase().contains(lowerQuery) || recipe.ingredients.any((ingredient) => ingredient.toLowerCase().contains(lowerQuery));
+    }).toList();
+
+    
+    
+    
+    
     return Scaffold(
       appBar: AppBar(title: const Text('Recetas de cocina 🍱')),
-      body: recipes.isEmpty
-          ? const Center(child: Text('No hay recetas disponibles. añade alguna!'))
-          : ListView.builder(
-              itemCount: recipes.length,
-              itemBuilder: (context, index) {
-                return RecipeItem(recipe: recipes[index]);
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: const InputDecoration(
+                labelText: 'Buscar recetas...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (query) {
+                setState(() {
+                  _searchQuery = query;
+                });
               },
             ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {},
-      //   child: const Icon(Icons.add),
-      // ),
+          ),
+          Expanded(
+            child: recipes.isEmpty
+                ? const Center(child: Text('No se encontraron recetas'))
+                : ListView.builder(
+                    itemCount: recipes.length,
+                    itemBuilder: (context, index) {
+                      return RecipeItem(recipe: recipes[index]);
+                    },
+                  ),
+          ),
+
+      ],),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AddRecipeScreen()));
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

@@ -2,7 +2,7 @@ class Recipe {
   final String id;
   final String title;
   final String description;
-  final String ingredients;
+  final List<String> ingredients;
   final String imageUrl;
   bool isFavorite;
 
